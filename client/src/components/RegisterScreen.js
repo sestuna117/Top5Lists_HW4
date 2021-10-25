@@ -14,13 +14,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { GlobalStoreContext } from '../store'
 
 export default function RegisterScreen() {
-    const { auth } = useContext(AuthContext);
+    const { registerUser } = useContext(AuthContext);
     const { store } = useContext(GlobalStoreContext)
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        auth.registerUser({
+        registerUser({
             firstName: formData.get('firstName'),
             lastName: formData.get('lastName'),
             email: formData.get('email'),

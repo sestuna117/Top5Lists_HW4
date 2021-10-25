@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useCallback } from "react";
 import { useHistory } from 'react-router-dom'
 import api from '../api'
 
@@ -21,10 +21,10 @@ function AuthContextProvider(props) {
     console.log(auth)
 
     useEffect(() => {
-        auth.getLoggedIn();
+        getLoggedIn();
     }, []);
 
-    const authReducer = (action) => {
+    const authReducer = useCallback((action) => {
         const { type, payload } = action;
         switch (type) {
             case AuthActionType.GET_LOGGED_IN: {
@@ -40,7 +40,6 @@ function AuthContextProvider(props) {
                 })
             }
             case AuthActionType.LOGIN_USER: {
-                console.log('happened');
                 return setAuth({
                     user: payload.user,
                     loggedIn: true
@@ -49,9 +48,9 @@ function AuthContextProvider(props) {
             default:
                 return auth;
         }
-    }
+    }, [setAuth]);
 
-    auth.getLoggedIn = async function () {
+    const getLoggedIn = useCallback(async () => {
         const response = await api.getLoggedIn();
         if (response.status === 200) {
             authReducer({
@@ -62,9 +61,9 @@ function AuthContextProvider(props) {
                 }
             });
         }
-    }
+    }, [authReducer])
 
-    auth.registerUser = async function(userData, store) {
+    const registerUser = useCallback(async (userData, store) => {
         const response = await api.registerUser(userData);      
         if (response.status === 200) {
             authReducer({
@@ -76,11 +75,10 @@ function AuthContextProvider(props) {
             history.push("/");
             store.loadIdNamePairs();
         }
-    }
+    }, [authReducer]);
 
-    auth.loginUser = async function(loginData, store) {
+    const loginUser = useCallback(async (loginData, store) => {
         const response = await api.loginUser(loginData);
-        console.log(response);
         if (response.status === 200) {
             authReducer({
                 type: AuthActionType.LOGIN_USER,
@@ -91,11 +89,11 @@ function AuthContextProvider(props) {
             history.push("/");
             store.loadIdNamePairs();
         }
-    }
+    }, [authReducer]);
 
     return (
         <AuthContext.Provider value={{
-            auth
+            auth, registerUser, loginUser
         }}>
             {props.children}
         </AuthContext.Provider>
