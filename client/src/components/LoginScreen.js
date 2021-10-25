@@ -32,14 +32,14 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function LoginScreen() {
-  const { auth } = useContext(AuthContext);
+  const { loginUser } = useContext(AuthContext);
   const { store } = useContext(GlobalStoreContext);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
-    auth.loginUser({
+    loginUser({
       email: formData.get('email'),
       password: formData.get('password')
     }, store);
