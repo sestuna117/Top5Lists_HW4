@@ -26,7 +26,8 @@ export const GlobalStoreActionType = {
     UNMARK_LIST_FOR_DELETION: "UNMARK_LIST_FOR_DELETION",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE"
+    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    CLOSE_TOP5LIST: "CLOSE_TOP5LIST",
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -45,6 +46,7 @@ function GlobalStoreContextProvider(props) {
         listMarkedForDeletion: null
     });
     const history = useHistory();
+    console.log(store);
 
     // SINCE WE'VE WRAPPED THE STORE IN THE AUTH CONTEXT WE CAN ACCESS THE USER HERE
     const { auth } = useContext(AuthContext);
@@ -153,6 +155,16 @@ function GlobalStoreContextProvider(props) {
                     listMarkedForDeletion: null
                 });
             }
+            case GlobalStoreActionType.CLOSE_TOP5LIST: {
+                return setStore({
+                    idNamePairs: [],
+                    currentList: null,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
             default:
                 return store;
         }
@@ -189,6 +201,13 @@ function GlobalStoreContextProvider(props) {
             }
             updateList(top5List);
         }
+    }
+
+    store.closeTop5List = function () {
+        storeReducer({
+            type: GlobalStoreActionType.CLOSE_TOP5LIST,
+            payload: {}
+        });
     }
 
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
@@ -232,7 +251,9 @@ function GlobalStoreContextProvider(props) {
     store.loadIdNamePairs = async function () {
         const response = await api.getTop5ListPairs();
         if (response.data.success) {
-            let pairsArray = response.data.idNamePairs;
+            console.log(response);
+            let pairsArray = response.data.idNamePairs.filter(pair => pair.owner === auth.user.email);
+
             storeReducer({
                 type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
                 payload: pairsArray
