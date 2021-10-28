@@ -122,8 +122,19 @@ loginUser = async (req, res) => {
     }).send();
 }
 
+logoutUser = async (req, res) => {
+    // Set token to none and expire after 5 seconds
+    await res.cookie('token', null, {
+        httpOnly: true,
+    }).status(200).json({
+        success: true,
+        user: null
+    });
+}
+
 module.exports = {
     getLoggedIn,
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser
 }
