@@ -59,7 +59,6 @@ function AuthContextProvider(props) {
 
     const getLoggedIn = useCallback(async () => {
         try {const response = await api.getLoggedIn();
-            console.log(response);
             if (response.status === 200) {
                 authReducer({
                     type: AuthActionType.GET_LOGGED_IN,
@@ -102,7 +101,7 @@ function AuthContextProvider(props) {
         }
     }, [authReducer]);
 
-    const logoutUser = useCallback(async () => {
+    const logoutUser = useCallback(async (store) => {
         const response = await api.logoutUser();
         if (response.status === 200) {
             authReducer({
@@ -111,6 +110,7 @@ function AuthContextProvider(props) {
                     user: response.data.user
                 }
             })
+            store.closeTop5List();
         }
     }, [authReducer])
 
