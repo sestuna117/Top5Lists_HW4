@@ -14,7 +14,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Button from '@mui/material/Button'
 
 export default function AppBanner() {
-    const { auth } = useContext(AuthContext);
+    const { auth, logoutUser } = useContext(AuthContext);
     const { store } = useContext(GlobalStoreContext);
     const [anchorEl, setAnchorEl] = useState(null);
     const isMenuOpen = Boolean(anchorEl);
@@ -29,7 +29,7 @@ export default function AppBanner() {
 
     const handleLogout = () => {
         handleMenuClose();
-        auth.logoutUser();
+        logoutUser();
     }
 
     const menuId = 'primary-search-account-menu';

@@ -10,6 +10,7 @@ export const AuthActionType = {
     GET_LOGGED_IN: "GET_LOGGED_IN",
     REGISTER_USER: "REGISTER_USER",
     LOGIN_USER: "LOGIN_USER",
+    LOGOUT_USER: "LOGOUT_USER",
 }
 
 function AuthContextProvider(props) {
@@ -45,21 +46,31 @@ function AuthContextProvider(props) {
                     loggedIn: true
                 })
             }
+            case AuthActionType.LOGOUT_USER: {
+                return setAuth({
+                    user: payload.user,
+                    loggedIn: false
+                })
+            }
             default:
                 return auth;
         }
     }, [setAuth]);
 
     const getLoggedIn = useCallback(async () => {
-        const response = await api.getLoggedIn();
-        if (response.status === 200) {
-            authReducer({
-                type: AuthActionType.SET_LOGGED_IN,
-                payload: {
-                    loggedIn: response.data.loggedIn,
-                    user: response.data.user
-                }
-            });
+        try {const response = await api.getLoggedIn();
+            console.log(response);
+            if (response.status === 200) {
+                authReducer({
+                    type: AuthActionType.GET_LOGGED_IN,
+                    payload: {
+                        loggedIn: response.data.loggedIn,
+                        user: response.data.user
+                    }
+                });
+            }}
+        catch {
+            return;
         }
     }, [authReducer])
 
@@ -91,9 +102,21 @@ function AuthContextProvider(props) {
         }
     }, [authReducer]);
 
+    const logoutUser = useCallback(async () => {
+        const response = await api.logoutUser();
+        if (response.status === 200) {
+            authReducer({
+                type: AuthActionType.LOGOUT_USER,
+                payload: {
+                    user: response.data.user
+                }
+            })
+        }
+    }, [authReducer])
+
     return (
         <AuthContext.Provider value={{
-            auth, registerUser, loginUser
+            auth, registerUser, loginUser, getLoggedIn, logoutUser
         }}>
             {props.children}
         </AuthContext.Provider>
