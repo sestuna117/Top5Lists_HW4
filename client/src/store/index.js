@@ -247,16 +247,18 @@ function GlobalStoreContextProvider(props) {
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = async function () {
-        const response = await api.getTop5ListPairs();
-        if (response.data.success) {
-            let pairsArray = response.data.idNamePairs.filter(pair => pair.owner === auth.user.email);
+        try {
+            const response = await api.getTop5ListPairs();
+            if (response.data.success) {
+                let pairsArray = response.data.idNamePairs.filter(pair => pair.owner === auth.user.email);
 
-            storeReducer({
-                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-                payload: pairsArray
-            });
+                storeReducer({
+                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                    payload: pairsArray
+                });
+            }
         }
-        else {
+        catch {
             console.log("API FAILED TO GET THE LIST PAIRS");
         }
     }
@@ -301,18 +303,23 @@ function GlobalStoreContextProvider(props) {
     // FUNCTIONS ARE setCurrentList, addMoveItemTransaction, addUpdateItemTransaction,
     // moveItem, updateItem, updateCurrentList, undo, and redo
     store.setCurrentList = async function (id) {
-        let response = await api.getTop5ListById(id);
-        if (response.data.success) {
-            let top5List = response.data.top5List;
-
-            response = await api.updateTop5ListById(top5List._id, top5List);
+        try {
+            let response = await api.getTop5ListById(id);
             if (response.data.success) {
-                storeReducer({
-                    type: GlobalStoreActionType.SET_CURRENT_LIST,
-                    payload: top5List
-                });
-                history.push("/top5list/" + top5List._id);
+                let top5List = response.data.top5List;
+
+                response = await api.updateTop5ListById(top5List._id, top5List);
+                if (response.data.success) {
+                    storeReducer({
+                        type: GlobalStoreActionType.SET_CURRENT_LIST,
+                        payload: top5List
+                    });
+                    history.push("/top5list/" + top5List._id);
+                }
             }
+        }
+        catch {
+            return false;
         }
     }
 

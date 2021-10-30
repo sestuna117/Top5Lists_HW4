@@ -14,12 +14,15 @@ const HomeScreen = () => {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext)
 
-    useEffect(() => {
-        if (auth.loggedIn) {
+    function handleLoad() {
+        if (!auth.loggedIn) {
             return;
         }
         store.loadIdNamePairs();
+    }
 
+    useEffect(() => {
+        handleLoad();
     }, [store.idNamePairs]);
 
     function handleCreateNewList() {
