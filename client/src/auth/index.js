@@ -48,7 +48,7 @@ function AuthContextProvider(props) {
             }
             case AuthActionType.LOGOUT_USER: {
                 return setAuth({
-                    user: payload.user,
+                    user: null,
                     loggedIn: false
                 })
             }
@@ -106,11 +106,10 @@ function AuthContextProvider(props) {
         if (response.status === 200) {
             authReducer({
                 type: AuthActionType.LOGOUT_USER,
-                payload: {
-                    user: response.data.user
-                }
+                payload: {}
             })
             store.closeTop5List();
+            history.push("/")
         }
     }, [authReducer])
 

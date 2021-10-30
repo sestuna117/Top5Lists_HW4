@@ -63,7 +63,6 @@ registerUser = async (req, res) => {
         await res.cookie("token", token, {
             httpOnly: true,
             secure: true,
-            sameSite: "none"
         }).status(200).json({
             success: true,
             user: {

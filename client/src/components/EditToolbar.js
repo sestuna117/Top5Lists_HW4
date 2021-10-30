@@ -24,29 +24,31 @@ function EditToolbar() {
         store.closeCurrentList();
     }
     let editStatus = false;
-    if (store.isListNameEditActive) {
+    if (store.isItemEditActive || !store.currentList) {
         editStatus = true;
-    }  
+    }
     return (
         <div id="edit-toolbar">
-            <Button 
+            <Button
+                disabled={!store.canUndo() || editStatus}
                 id='undo-button'
-                onClick={handleUndo}
+                onClick={store.canUndo() ? handleUndo : null}
                 variant="contained">
-                    <UndoIcon />
+                <UndoIcon />
             </Button>
-            <Button 
+            <Button
+                disabled={!store.canRedo() || editStatus}
                 id='redo-button'
-                onClick={handleRedo}
+                onClick={store.canRedo() ? handleRedo : null}
                 variant="contained">
-                    <RedoIcon />
+                <RedoIcon />
             </Button>
-            <Button 
+            <Button
                 disabled={editStatus}
                 id='close-button'
-                onClick={handleClose}
+                onClick={!editStatus ? handleClose : null}
                 variant="contained">
-                    <CloseIcon />
+                <CloseIcon />
             </Button>
         </div>
     )
