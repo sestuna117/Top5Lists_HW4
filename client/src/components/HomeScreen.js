@@ -5,6 +5,8 @@ import { Fab, Typography } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import List from '@mui/material/List';
 import AuthContext from '../auth';
+import DeleteModal from './DeleteModal'
+
 /*
     This React component lists all the top5 lists in the UI.
     
@@ -14,16 +16,12 @@ const HomeScreen = () => {
     const { store } = useContext(GlobalStoreContext);
     const { auth } = useContext(AuthContext)
 
-    function handleLoad() {
-        if (!auth.loggedIn) {
+    useEffect(() => {
+        if (!auth.loggedIn || store.idNamePairs === 0) {
             return;
         }
         store.loadIdNamePairs();
-    }
-
-    useEffect(() => {
-        handleLoad();
-    }, [store.idNamePairs]);
+    }, [auth]);
 
     function handleCreateNewList() {
         store.createNewList();
@@ -41,6 +39,7 @@ const HomeScreen = () => {
                         />
                     ))
                 }
+                <DeleteModal />
             </List>;
     }
     return (

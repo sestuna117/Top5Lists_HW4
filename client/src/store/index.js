@@ -267,16 +267,20 @@ function GlobalStoreContextProvider(props) {
     // OF A LIST, WHICH INCLUDES USING A VERIFICATION MODAL. THE
     // FUNCTIONS ARE markListForDeletion, deleteList, deleteMarkedList,
     // showDeleteListModal, and hideDeleteListModal
-    store.markListForDeletion = async function (id) {
+    store.markListForDeletion = async function (idNamePair) {
+        storeReducer({
+            type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
+            payload: idNamePair
+        })
         // GET THE LIST
-        let response = await api.getTop5ListById(id);
-        if (response.data.success) {
-            let top5List = response.data.top5List;
-            storeReducer({
-                type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
-                payload: top5List
-            });
-        }
+        // let response = await api.getTop5ListById(id);
+        // if (response.data.success) {
+        //     let top5List = response.data.top5List;
+        //     storeReducer({
+        //         type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
+        //         payload: top5List
+        //     });
+        // }
     }
 
     store.deleteList = async function (listToDelete) {

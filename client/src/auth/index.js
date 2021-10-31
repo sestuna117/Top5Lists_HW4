@@ -19,7 +19,7 @@ function AuthContextProvider(props) {
         loggedIn: false
     });
     const history = useHistory();
-    console.log(auth)
+    // console.log(auth)
 
     useEffect(() => {
         getLoggedIn();

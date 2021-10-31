@@ -24,6 +24,7 @@ export default function UnauthModal() {
                     border: '2px solid #000',
                     boxShadow: 24,
                     p: 4,
+                    borderRadius: 2
                 }}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
                         Unathorized Access!
