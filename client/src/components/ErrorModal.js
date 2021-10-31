@@ -31,7 +31,7 @@ function ErrorModal() {
                 p: 4,
             }}>
                 <Alert severity="error">{msg}</Alert>
-                <Button sx={{ position: 'relative', left: '80%', }} onClick={handleCloseModal}>Close</Button>
+                <Button sx={{ position: 'relative', left: '80%', }} onClick={handleCloseModal}>OK</Button>
             </Box>
         </Modal >
     );
