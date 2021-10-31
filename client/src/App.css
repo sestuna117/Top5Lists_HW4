@@ -261,6 +261,10 @@ input {
   color: var(--swatch-neutral);
 }
 
+.disabled-link {
+  pointer-events: none;
+}
+
 /* THIS STYLE SHEET MANAGES STYLE FOR OUR MODAL, i.e. DIALOG BOX */
 
 .modal {

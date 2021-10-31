@@ -17,6 +17,10 @@ const HomeScreen = () => {
     const { auth } = useContext(AuthContext)
 
     useEffect(() => {
+        store.clearTransactions();
+    },[])
+
+    useEffect(() => {
         if (!auth.loggedIn || store.idNamePairs === 0) {
             return;
         }
@@ -50,6 +54,7 @@ const HomeScreen = () => {
                     aria-label="add"
                     id="add-list-button"
                     onClick={handleCreateNewList}
+                    disabled={store.isListNameEditActive}
                 >
                     <AddIcon />
                 </Fab>

@@ -41,8 +41,8 @@ function GlobalStoreContextProvider(props) {
         idNamePairs: [],
         currentList: null,
         newListCounter: 0,
-        listNameActive: false,
-        itemActive: false,
+        isListNameEditActive: false,
+        isItemEditActive: false,
         listMarkedForDeletion: null
     });
     const history = useHistory();
@@ -217,6 +217,10 @@ function GlobalStoreContextProvider(props) {
         });
         tps.clearAllTransactions();
         history.push("/");
+    }
+
+    store.clearTransactions = function () {
+        tps.clearAllTransactions();
     }
 
     // THIS FUNCTION CREATES A NEW LIST
