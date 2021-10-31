@@ -11,15 +11,18 @@ export const AuthActionType = {
     REGISTER_USER: "REGISTER_USER",
     LOGIN_USER: "LOGIN_USER",
     LOGOUT_USER: "LOGOUT_USER",
+    SET_ERROR_MSG: "SET_ERROR_MSG",
+    CLOSE_ERROR_MSG: "CLOSE_ERROR_MSG",
 }
 
 function AuthContextProvider(props) {
     const [auth, setAuth] = useState({
         user: null,
-        loggedIn: false
+        loggedIn: false,
+        errorMsg: "",
     });
     const history = useHistory();
-    console.log(auth)
+    // console.log(auth)
 
     useEffect(() => {
         getLoggedIn();
@@ -31,25 +34,43 @@ function AuthContextProvider(props) {
             case AuthActionType.GET_LOGGED_IN: {
                 return setAuth({
                     user: payload.user,
-                    loggedIn: payload.loggedIn
+                    loggedIn: payload.loggedIn,
+                    errorMsg: "",
                 });
             }
             case AuthActionType.REGISTER_USER: {
                 return setAuth({
                     user: payload.user,
-                    loggedIn: true
+                    loggedIn: true,
+                    errorMsg: "",
                 })
             }
             case AuthActionType.LOGIN_USER: {
                 return setAuth({
                     user: payload.user,
-                    loggedIn: true
+                    loggedIn: true,
+                    errorMsg: "",
                 })
             }
             case AuthActionType.LOGOUT_USER: {
                 return setAuth({
-                    user: payload.user,
-                    loggedIn: false
+                    user: null,
+                    loggedIn: false,
+                    errorMsg: "",
+                })
+            }
+            case AuthActionType.SET_ERROR_MSG: {
+                return setAuth({
+                    user: null,
+                    loggedIn: false,
+                    errorMsg: payload.errMsg,
+                })
+            }
+            case AuthActionType.CLOSE_ERROR_MSG: {
+                return setAuth({
+                    user: null,
+                    loggedIn: false,
+                    errorMsg: "",
                 })
             }
             default:
@@ -58,7 +79,8 @@ function AuthContextProvider(props) {
     }, [setAuth]);
 
     const getLoggedIn = useCallback(async () => {
-        try {const response = await api.getLoggedIn();
+        try {
+            const response = await api.getLoggedIn();
             if (response.status === 200) {
                 authReducer({
                     type: AuthActionType.GET_LOGGED_IN,
@@ -67,38 +89,62 @@ function AuthContextProvider(props) {
                         user: response.data.user
                     }
                 });
-            }}
+            }
+        }
         catch {
             return;
         }
     }, [authReducer])
 
     const registerUser = useCallback(async (userData, store) => {
-        const response = await api.registerUser(userData);      
-        if (response.status === 200) {
+        try {
+            const response = await api.registerUser(userData);
+            if (response.status === 200) {
+                authReducer({
+                    type: AuthActionType.REGISTER_USER,
+                    payload: {
+                        user: response.data.user
+                    }
+                })
+                history.push("/");
+                store.loadIdNamePairs();
+            }
+        }
+        catch (err) {
+            // console.error(err.response.data.errorMessage);
             authReducer({
-                type: AuthActionType.REGISTER_USER,
+                type: AuthActionType.SET_ERROR_MSG,
                 payload: {
-                    user: response.data.user
+                    errMsg: err.response.data.errorMessage
                 }
             })
-            history.push("/");
-            store.loadIdNamePairs();
         }
     }, [authReducer]);
 
     const loginUser = useCallback(async (loginData, store) => {
-        const response = await api.loginUser(loginData);
-        if (response.status === 200) {
+        try {
+            const response = await api.loginUser(loginData);
+            if (response.status === 200) {
+                authReducer({
+                    type: AuthActionType.LOGIN_USER,
+                    payload: {
+                        user: response.data.user
+                    }
+                })
+                history.push("/");
+                store.loadIdNamePairs();
+            }
+        }
+        catch (err) {
+            // console.error(err.response.data.errorMessage);
             authReducer({
-                type: AuthActionType.LOGIN_USER,
+                type: AuthActionType.SET_ERROR_MSG,
                 payload: {
-                    user: response.data.user
+                    errMsg: err.response.data.errorMessage
                 }
             })
-            history.push("/");
-            store.loadIdNamePairs();
         }
+
     }, [authReducer]);
 
     const logoutUser = useCallback(async (store) => {
@@ -106,17 +152,23 @@ function AuthContextProvider(props) {
         if (response.status === 200) {
             authReducer({
                 type: AuthActionType.LOGOUT_USER,
-                payload: {
-                    user: response.data.user
-                }
+                payload: {}
             })
             store.closeTop5List();
+            history.push("/")
         }
     }, [authReducer])
 
+    const closeErrorMsg = useCallback(() => {
+        authReducer({
+            type: AuthActionType.CLOSE_ERROR_MSG,
+            payload: {}
+        })
+    })
+
     return (
         <AuthContext.Provider value={{
-            auth, registerUser, loginUser, getLoggedIn, logoutUser
+            auth, registerUser, loginUser, getLoggedIn, logoutUser, closeErrorMsg
         }}>
             {props.children}
         </AuthContext.Provider>

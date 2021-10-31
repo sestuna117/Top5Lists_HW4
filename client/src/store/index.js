@@ -46,7 +46,7 @@ function GlobalStoreContextProvider(props) {
         listMarkedForDeletion: null
     });
     const history = useHistory();
-    console.log(store);
+    // console.log(store);
 
     // SINCE WE'VE WRAPPED THE STORE IN THE AUTH CONTEXT WE CAN ACCESS THE USER HERE
     const { auth } = useContext(AuthContext);
@@ -60,7 +60,7 @@ function GlobalStoreContextProvider(props) {
             case GlobalStoreActionType.CHANGE_LIST_NAME: {
                 return setStore({
                     idNamePairs: payload.idNamePairs,
-                    currentList: payload.top5List,
+                    currentList: null,
                     newListCounter: store.newListCounter,
                     isListNameEditActive: false,
                     isItemEditActive: false,
@@ -186,12 +186,11 @@ function GlobalStoreContextProvider(props) {
                     async function getListPairs(top5List) {
                         response = await api.getTop5ListPairs();
                         if (response.data.success) {
-                            let pairsArray = response.data.idNamePairs;
+                            let pairsArray = response.data.idNamePairs.filter(pair => pair.owner === auth.user.email);
                             storeReducer({
                                 type: GlobalStoreActionType.CHANGE_LIST_NAME,
                                 payload: {
                                     idNamePairs: pairsArray,
-                                    top5List: top5List
                                 }
                             });
                         }
@@ -216,7 +215,6 @@ function GlobalStoreContextProvider(props) {
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {}
         });
-        
         tps.clearAllTransactions();
         history.push("/");
     }
@@ -249,17 +247,18 @@ function GlobalStoreContextProvider(props) {
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = async function () {
-        const response = await api.getTop5ListPairs();
-        if (response.data.success) {
-            console.log(response);
-            let pairsArray = response.data.idNamePairs.filter(pair => pair.owner === auth.user.email);
+        try {
+            const response = await api.getTop5ListPairs();
+            if (response.data.success) {
+                let pairsArray = response.data.idNamePairs.filter(pair => pair.owner === auth.user.email);
 
-            storeReducer({
-                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
-                payload: pairsArray
-            });
+                storeReducer({
+                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                    payload: pairsArray
+                });
+            }
         }
-        else {
+        catch {
             console.log("API FAILED TO GET THE LIST PAIRS");
         }
     }
@@ -268,16 +267,20 @@ function GlobalStoreContextProvider(props) {
     // OF A LIST, WHICH INCLUDES USING A VERIFICATION MODAL. THE
     // FUNCTIONS ARE markListForDeletion, deleteList, deleteMarkedList,
     // showDeleteListModal, and hideDeleteListModal
-    store.markListForDeletion = async function (id) {
+    store.markListForDeletion = async function (idNamePair) {
+        storeReducer({
+            type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
+            payload: idNamePair
+        })
         // GET THE LIST
-        let response = await api.getTop5ListById(id);
-        if (response.data.success) {
-            let top5List = response.data.top5List;
-            storeReducer({
-                type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
-                payload: top5List
-            });
-        }
+        // let response = await api.getTop5ListById(id);
+        // if (response.data.success) {
+        //     let top5List = response.data.top5List;
+        //     storeReducer({
+        //         type: GlobalStoreActionType.MARK_LIST_FOR_DELETION,
+        //         payload: top5List
+        //     });
+        // }
     }
 
     store.deleteList = async function (listToDelete) {
@@ -304,18 +307,23 @@ function GlobalStoreContextProvider(props) {
     // FUNCTIONS ARE setCurrentList, addMoveItemTransaction, addUpdateItemTransaction,
     // moveItem, updateItem, updateCurrentList, undo, and redo
     store.setCurrentList = async function (id) {
-        let response = await api.getTop5ListById(id);
-        if (response.data.success) {
-            let top5List = response.data.top5List;
-
-            response = await api.updateTop5ListById(top5List._id, top5List);
+        try {
+            let response = await api.getTop5ListById(id);
             if (response.data.success) {
-                storeReducer({
-                    type: GlobalStoreActionType.SET_CURRENT_LIST,
-                    payload: top5List
-                });
-                history.push("/top5list/" + top5List._id);
+                let top5List = response.data.top5List;
+
+                response = await api.updateTop5ListById(top5List._id, top5List);
+                if (response.data.success) {
+                    storeReducer({
+                        type: GlobalStoreActionType.SET_CURRENT_LIST,
+                        payload: top5List
+                    });
+                    history.push("/top5list/" + top5List._id);
+                }
             }
+        }
+        catch {
+            return false;
         }
     }
 
@@ -375,11 +383,11 @@ function GlobalStoreContextProvider(props) {
         tps.doTransaction();
     }
 
-    store.canUndo = function() {
+    store.canUndo = function () {
         return tps.hasTransactionToUndo();
     }
 
-    store.canRedo = function() {
+    store.canRedo = function () {
         return tps.hasTransactionToRedo();
     }
 

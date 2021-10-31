@@ -63,7 +63,6 @@ registerUser = async (req, res) => {
         await res.cookie("token", token, {
             httpOnly: true,
             secure: true,
-            sameSite: "none"
         }).status(200).json({
             success: true,
             user: {
@@ -92,7 +91,7 @@ loginUser = async (req, res) => {
             .status(401)
             .json({
                 success: false,
-                errorMessage: "An account with this email address doesn't exists."
+                errorMessage: "Wrong email or password."
             })
     }
     const correctPass = await bcrypt.compare(password, existingUser.passwordHash);
@@ -111,7 +110,6 @@ loginUser = async (req, res) => {
     await res.cookie("token", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "none"
     }).status(200).json({
         success: true,
         user: {

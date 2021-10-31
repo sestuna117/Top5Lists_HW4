@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useContext } from 'react';
 import AuthContext from '../auth'
 import { GlobalStoreContext } from '../store'
+import ErrorModal from './ErrorModal';
 
 function Copyright(props) {
   return (
@@ -129,6 +130,7 @@ export default function LoginScreen() {
           </Box>
         </Grid>
       </Grid>
+      <ErrorModal />
     </ThemeProvider>
   );
 }

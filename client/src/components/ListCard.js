@@ -40,15 +40,19 @@ function ListCard(props) {
         setEditActive(newActive);
     }
 
-    async function handleDeleteList(event, id) {
+    function handleDeleteList(event, idNamePair) {
         event.stopPropagation();
-        store.markListForDeletion(id);
+        store.markListForDeletion(idNamePair);
     }
 
     function handleKeyPress(event) {
         if (event.code === "Enter") {
             let id = event.target.id.substring("list-".length);
-            store.changeListName(id, text);
+            let newText = event.target.value;
+            if (text === "") {
+                newText = idNamePair.name;
+            }
+            store.changeListName(id, newText);
             toggleEdit();
         }
     }
@@ -79,7 +83,7 @@ function ListCard(props) {
                 </Box>
                 <Box sx={{ p: 1 }}>
                     <IconButton onClick={(event) => {
-                        handleDeleteList(event, idNamePair._id)
+                        handleDeleteList(event, idNamePair)
                     }} aria-label='delete'>
                         <DeleteIcon style={{fontSize:'48pt'}} />
                     </IconButton>
