@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
+import { Button } from '@mui/material';
 
 export default function AppBanner() {
     const { auth, logoutUser } = useContext(AuthContext);
@@ -108,17 +109,15 @@ export default function AppBanner() {
                             color="inherit"
                         >
                             {getAccountMenu(auth.loggedIn)}
-                        </IconButton> : <Typography
+                        </IconButton> : <Button
                             variant="h4"
-                            noWrap
-                            component="div"
-                            aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
+                            type="submit"
+                            fullWidth
+                            sx={{ fontSize: 25 }}
                             onClick={handleProfileMenuOpen}
                         >
                             {(auth.user.firstName.charAt(0) + auth.user.lastName.charAt(0)).toUpperCase()}
-                        </Typography>}
+                        </Button>}
                     </Box>
                 </Toolbar>
             </AppBar>
