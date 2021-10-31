@@ -17,6 +17,10 @@ const HomeScreen = () => {
     const { auth } = useContext(AuthContext)
 
     useEffect(() => {
+        store.clearTransactions();
+    },[])
+
+    useEffect(() => {
         if (!auth.loggedIn || store.idNamePairs === 0) {
             return;
         }
